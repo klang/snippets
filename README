@@ -1,0 +1,21 @@
+# snippets
+
+Snippet server example from chapter 9.3 in Programming Clojure.
+
+The application has been changed a bit to reflect current state of clojure development. Refer to project.clj for further information.
+
+## Usage
+
+lein run script/run.clj
+
+or
+
+lein swank (or M-x swank-clojure-project in emacs)
+
+and in the resulting repl
+
+(load-file "script/run.clj")
+
+## Installation
+
+lein deps
