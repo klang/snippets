@@ -5,6 +5,7 @@
 	hiccup.form-helpers
 	snippets.middleware
 	snippets.database
+	ring.middleware.params
 	ring.middleware.file
 	ring.middleware.file-info
 	ring.middleware.reload
@@ -65,6 +66,7 @@
   (-> #'handler
     (wrap-utf)
     (wrap-file "public")
+    (wrap-params)
     (wrap-file-info)
     (wrap-request-logging)
     (wrap-if development? wrap-reload '[snippets.middleware snippets.core])
