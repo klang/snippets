@@ -1,5 +1,7 @@
 (ns snippets.database
-  (:use clojure.contrib.sql))
+  (:refer-clojure :exclude [take drop sort distinct compile conj! disj!])
+  (:use clojure.contrib.sql clojureql.core)
+  #_(:use clojure.contrib.sql))
 
 (defn create-snippets []
   (create-table :snippets
@@ -79,3 +81,26 @@
        [:body :created_at]
        [body (now)])
      (last-created-id))))
+
+(comment
+  (def snippets (table db :snippets))
+
+  (defn select-snippets []
+    @snippets)
+
+  (defn select-snippet [id]
+    (first @(select snippets (where (= :id id)))))
+
+  (defn insert-snippet [body]
+    (:id (last @(conj! snippets {:body body :created_at (now)}))))
+  (def db   {:classname   "com.mysql.jdbc.Driver"
+	     :subprotocol "mysql"
+	     :user        "snippets"
+	     :password    "snippets"
+	     :subname     "//localhost:3306/snippets"})
+
+  ;; automatic timestamp in mySql
+  (defn insert-snippet [body]
+    (:id (last @(conj! snippets {:body body}))))
+
+  )

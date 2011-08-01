@@ -9,6 +9,7 @@
    [ring/ring-jetty-adapter "0.3.11"]
    [compojure "0.6.5"]
    [hiccup "0.3.6"]
+   [clojureql "1.0.1"]
    [hsqldb "1.8.0.10"]] ;"2.0.0"
   :dev-dependencies
   [[lein-run "1.0.0-SNAPSHOT"]
