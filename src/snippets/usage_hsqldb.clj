@@ -1,17 +1,12 @@
-(ns snippets.database
-  (:refer-clojure :exclude [take drop sort distinct compile conj! disj!])
-  (:use clojure.contrib.sql clojureql.core)
-  #_(:use clojure.contrib.sql))
+(ns snippets.usage-hsqldb
+  (:use clojure.contrib.sql
+	snippets.hsqldb-database-connection))
 
 (defn create-snippets []
   (create-table :snippets
     [:id :int "IDENTITY" "PRIMARY KEY"]
     [:body :varchar "NOT NULL"]
     [:created_at :datetime]))
-
-(def db {:classname "org.hsqldb.jdbcDriver"
-         :subprotocol "hsqldb"
-         :subname "/tmp/snippet.db"})
 
 (try 
  (with-connection db (create-snippets)) 
@@ -82,25 +77,3 @@
        [body (now)])
      (last-created-id))))
 
-(comment
-  (def snippets (table db :snippets))
-
-  (defn select-snippets []
-    @snippets)
-
-  (defn select-snippet [id]
-    (first @(select snippets (where (= :id id)))))
-
-  (defn insert-snippet [body]
-    (:id (last @(conj! snippets {:body body :created_at (now)}))))
-  (def db   {:classname   "com.mysql.jdbc.Driver"
-	     :subprotocol "mysql"
-	     :user        "snippets"
-	     :password    "snippets"
-	     :subname     "//localhost:3306/snippets"})
-
-  ;; automatic timestamp in mySql
-  (defn insert-snippet [body]
-    (:id (last @(conj! snippets {:body body}))))
-
-  )

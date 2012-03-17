@@ -1,17 +1,11 @@
 (ns snippets.core
-  (:use compojure.core
-	hiccup.core
-	hiccup.page-helpers
-	hiccup.form-helpers
-	snippets.middleware
-	snippets.database
-	ring.middleware.params
-	ring.middleware.file
-	ring.middleware.file-info
-	ring.middleware.reload
-	ring.middleware.stacktrace
-	ring.util.response)
-  (:require [compojure.route :as route]))
+  (:use (compojure core)
+	(hiccup core page form)
+	(ring.middleware params file file-info reload stacktrace)
+	(ring.util response)
+	(snippets middleware))
+  (:require [compojure.route :as route]
+	    (snippets.model [snippet   :as snippet])))
 
 (def production?
   (= "production" (get (System/getenv) "APP_ENV")))
@@ -32,20 +26,19 @@
 (defn new-snippet []
   (layout "Create a Snippet"
    (form-to [:post "/snippet"]
-     #_(text-area {:rows 20 :cols 73} "body")
      (text-area :body)
      [:br]
      (submit-button "Save"))))
 
 (defn show-snippet [id]
   (layout (str "Snippet " id)
-    (let [snippet (select-snippet id)]
+    (let [snippet (snippet/get-record id)]
       (html
        [:div [:pre [:code.clojure (:body snippet)]]]
        [:div (:created_at snippet)]))))
 
 (defn create-snippet [body]
-  (if-let [id (insert-snippet body)]
+  (if-let [id (:id (snippet/create {:body body}))]
     (redirect (str "/snippet/" id))
     (redirect "/snippet")))
 
@@ -53,14 +46,10 @@
   [(Integer/parseInt a) (Integer/parseInt b)])
 
 (defroutes handler
-  (GET "/ping" [] "pong")
-  (GET "/pong" [] "ping")
-  (GET "/foo/:id" [id] (str "foo " id))
   (GET "/snippet" [] (new-snippet))
   (GET "/snippet/:id" [id] (show-snippet id))
   (POST "/snippet" [body] (create-snippet body))
-  (ANY "/*" [path] (redirect "/snippet"))
-  )
+  (ANY "/*" [path] (redirect "/snippet")))
 
 (def app
   (-> #'handler
